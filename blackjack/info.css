@@ -1,0 +1,74 @@
+.table-header {
+    font-size: medium;
+    font-weight: bold;
+    text-align: center;
+    padding: 1%;
+}
+
+.table-cell {
+    font-size: medium;
+    text-align: center;
+    border: 1px #FBFAF5 solid;
+    padding: 1%;
+}
+
+
+.header {
+    font-size: x-large;
+    text-align: center;
+    font-weight: bold;
+    padding: 2%;
+    margin-top: 2%;
+}
+
+.subheader {
+    font-size: large;
+    font-weight: bold;
+    margin-top: 1%;
+}
+
+
+.H {
+    color: black;
+    background-color: #009E73;
+}
+
+.S {
+    color: black;
+    background-color: #F0E442;
+}
+
+.P {
+    color: black;
+    background-color: #CC79A7;
+}
+
+.DH {
+    color: black;
+    background-color: #56B4E9;
+}
+
+.DS {
+    color: black;
+    background-color: #0072B2;
+}
+
+.RH {
+    color: black;
+    background-color: #E69F00;
+}
+
+.RP {
+    color: black;
+    background-color: #E69F00;
+}
+
+.RS {
+    color: black;
+    background-color: #D55E00;
+}
+
+.spacer {
+    padding: 1%;
+    border: 1px solid #333333;
+}

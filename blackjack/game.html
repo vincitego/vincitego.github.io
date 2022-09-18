@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#666666">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="description" content="Basic Strategy and Advantage Play training tools for Blackjack">
+
+    <title>Blackjack Counting Trainer</title>
+
+    <link rel="stylesheet" type="text/css" href="./blackjack.css">
+    <link rel="stylesheet" type="text/css" href="./game.css">
+    <link rel="manifest" href="./manifest.json">
+
+    <link rel="apple-touch-icon" href="./icons/apple-icon-180.png">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-2732-2048.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-1668-2388.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-2388-1668.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-1536-2048.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-2048-1536.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-1668-2224.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-2224-1668.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-1620-2160.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-2160-1620.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-1284-2778.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-2778-1284.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-1170-2532.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-2532-1170.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-1125-2436.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-2436-1125.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-1242-2688.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-2688-1242.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-828-1792.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-1792-828.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-1242-2208.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-2208-1242.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-750-1334.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-1334-750.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-640-1136.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="./icons/apple-splash-1136-640.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+</head>
+
+<script type="module" src="./init.js"></script>
+<script type="module" src="./game.js"></script>
+
+<body>
+
+
+<div class="row game-info">
+    <div class="col-xs-1 col-s-1 col-1">RC</div>
+    <div class="col-xs-1 col-s-1 col-1 spoiler" id="runningCount"></div>
+    
+    <div class="display-none col-xs-1 col-s-1 col-1">TC</div>
+    <div class="display-none col-xs-1 col-s-1 col-1 spoiler" id="trueCount"></div>
+    
+    <div class="col-xs-3 col-s-2 col-1">Cards Left</div>
+    <div class="col-xs-1 col-s-1 col-1" id="numCardsLeft"></div>
+    
+    <div class="col-xs-2 col-s-2 col-1">Balance</div>
+    <div class="col-xs-2 col-s-2 col-2" id="lifetimeWinnings"></div>
+</div>
+
+
+<div class="row card-row">
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="dealerBack0" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="dealerFront0"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="dealerBack1" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="dealerFront1"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="dealerBack2" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="dealerFront2"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="dealerBack3" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="dealerFront3"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="dealerBack4" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="dealerFront4"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="dealerBack5" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="dealerFront5"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="dealerBack6" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="dealerFront6"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="dealerBack7" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="dealerFront7"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="dealerBack8" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="dealerFront8"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="dealerBack9" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="dealerFront9"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="dealerBack10" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="dealerFront10"></div>
+    </div>
+</div>
+
+
+<div class="row card-row" id="player3Hand">
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player3Back0" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player3Front0"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player3Back1" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player3Front1"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player3Back2" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player3Front2"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player3Back3" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player3Front3"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player3Back4" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player3Front4"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player3Back5" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player3Front5"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player3Back6" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player3Front6"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player3Back7" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player3Front7"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player3Back8" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player3Front8"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player3Back9" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player3Front9"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player3Back10" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player3Front10"></div>
+    </div>
+
+    <h1 id="player3Bet" class="col-xs-1 col-s-1 col-1"></h1>
+</div>
+
+
+<div class="row card-row" id="player2Hand">
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player2Back0" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player2Front0"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player2Back1" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player2Front1"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player2Back2" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player2Front2"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player2Back3" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player2Front3"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player2Back4" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player2Front4"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player2Back5" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player2Front5"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player2Back6" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player2Front6"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player2Back7" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player2Front7"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player2Back8" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player2Front8"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player2Back9" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player2Front9"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player2Back10" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player2Front10"></div>
+    </div>
+
+    <h1 id="player2Bet" class="col-xs-1 col-s-1 col-1"></h1>
+</div>
+
+
+<div class="row card-row" id="player1Hand">
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player1Back0" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player1Front0"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player1Back1" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player1Front1"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player1Back2" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player1Front2"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player1Back3" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player1Front3"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player1Back4" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player1Front4"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player1Back5" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player1Front5"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player1Back6" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player1Front6"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player1Back7" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player1Front7"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player1Back8" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player1Front8"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player1Back9" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player1Front9"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player1Back10" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player1Front10"></div>
+    </div>
+
+    <h1 id="player1Bet" class="col-xs-1 col-s-1 col-1"></h1>
+</div>
+
+
+<div class="row card-row active-hand" id="player0Hand">
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player0Back0" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player0Front0"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player0Back1" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player0Front1"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player0Back2" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player0Front2"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player0Back3" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player0Front3"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player0Back4" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player0Front4"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player0Back5" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player0Front5"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player0Back6" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player0Front6"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player0Back7" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player0Front7"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player0Back8" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player0Front8"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player0Back9" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player0Front9"></div>
+    </div>
+
+    <div class="col-xs-1 col-s-1 col-1 card">
+        <img class="back display-none" id="player0Back10" src="./images/card_back.png" alt="Playing Card Back" />
+        <div class="front display-none" id="player0Front10"></div>
+    </div>
+
+    <h1 id="player0Bet" class="col-xs-1 col-s-1 col-1"></h1>
+</div>
+
+
+<div class="row choices">
+    <div class="input" id="betting">
+        <label for="betAmount" id="betAmountLabel" class="col-xs-2 col-s-1 col-1">Bet: </label>
+        <input id="betAmount" class="col-xs-2 col-s-2 col-1" type="number" value="5" />
+        <div class="col-xs-1 col-s-1 col-1"></div>
+        <div class="deal-button col-xs-2 col-s-2 col-1" id="deal">Deal</div>
+    </div>
+
+    <div class="display-none" id="insurance">
+        <h1 class="col-xs-3 col-s-3 col-2">Insurance?</h1>
+        <div class="action col-xs-1 col-s-1 col-1" id="insuranceYes">Yes</div>
+        <div class="action col-xs-1 col-s-1 col-1" id="insuranceNo">No</div>
+    </div>
+
+    <div class="display-none" id="actions">
+        <div class="action col-xs-2 col-s-2 col-1" id="hit">Hit</div>
+        <div class="display-none action col-xs-2 col-s-2 col-1" id="split">Split</div>
+        <div class="display-none action col-xs-2 col-s-2 col-1" id="double">Double</div>
+        <div class="action col-xs-2 col-s-2 col-1" id="stand">Stand</div>
+        <div class="display-none action col-xs-4 col-s-4 col-2" id="surrender">Surrender</div>
+    </div>
+</div>
+
+
+<div id="snackbar"></div>
+
+</body>
+</html>

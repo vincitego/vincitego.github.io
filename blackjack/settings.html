@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#666666">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="Basic Strategy and Advantage Play training tools for Blackjack">
+
+  <title>Blackjack Counting Trainer</title>
+  
+  <link rel="stylesheet" type="text/css" href="./blackjack.css">
+  <link rel="stylesheet" type="text/css" href="./settings.css">
+  <link rel="manifest" href="./manifest.json">
+
+  <link rel="apple-touch-icon" href="./icons/apple-icon-180.png">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-2732-2048.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-1668-2388.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-2388-1668.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-1536-2048.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-2048-1536.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-1668-2224.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-2224-1668.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-1620-2160.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-2160-1620.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-1284-2778.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-2778-1284.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-1170-2532.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-2532-1170.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-1125-2436.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-2436-1125.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-1242-2688.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-2688-1242.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-828-1792.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-1792-828.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-1242-2208.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-2208-1242.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-750-1334.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-1334-750.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-640-1136.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="./icons/apple-splash-1136-640.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+</head>
+
+<script type="module" src="./init.js"></script>
+<script type="module" src="./settings.js"></script>
+
+<body>
+
+
+<div class="row banner">
+  <h1 class="banner-text col-xs-12 col-s-12 col-12">Settings</h1>
+</div>
+
+
+<div class="row input">
+  <label for="countingSystem" class="col-xs-6 col-s-6 col-8">Counting System</label>
+  <select class="col-xs-6 col-s-6 col-4" id="countingSystem">
+    <option value="Hi-Lo">Hi-Lo</option>
+    <option value="Knockout" selected>Knockout</option>
+  </select>
+</div>
+
+<div class="row input">
+  <label for="numDecks" class="col-xs-6 col-s-6 col-8">Number of Decks</label>
+  <select class="col-xs-6 col-s-6 col-4" id="numDecks">
+    <option value="1">1</option>
+    <option value="2" selected>2</option>
+    <option value="4">4</option>
+    <option value="6">6</option>
+    <option value="8">8</option>
+  </select>
+</div>
+
+<div class="row input">
+  <label for="doubleAllowed" class="col-xs-6 col-s-6 col-8">Double Allowed On</label>
+  <select class="col-xs-6 col-s-6 col-4" id="doubleAllowed">
+    <option value="Any 2" selected>Any 2</option>
+    <option value="9/10/11">9/10/11</option>
+    <option value="10/11">10/11</option>
+  </select>
+</div>
+
+<div class="row input">
+  <label for="penetrationPercent" class="col-xs-4 col-s-5 col-7">Deck Penetration</label>
+  <div class="col-xs-2 col-s-1 col-1" id="penetrationPercentValue"></div>
+  <div class="col-xs-6 col-s-6 col-4">
+  	<input type="range" min="25" max="100" value="70" step="5" class="slider" id="penetrationPercent">
+  </div>
+</div>
+
+<div class="row input">
+  <div class="col-xs-9 col-s-10 col-11">Dealer Hits Soft 17</div>
+  <div class="col-xs-3 col-s-2 col-1">
+    <label class="toggle-container" for="dealerHitSoft17">
+      <input type="checkbox" id="dealerHitSoft17" checked>
+      <span class="toggle"></span>
+    </label>
+  </div>
+</div>
+
+<div class="row input">
+  <div class="col-xs-9 col-s-10 col-11">Double After Split Allowed</div>
+  <div class="col-xs-3 col-s-2 col-1">
+    <label class="toggle-container" for="doubleAfterSplit">
+      <input type="checkbox" id="doubleAfterSplit" checked>
+      <span class="toggle"></span>
+    </label>
+  </div>
+</div>
+
+<div class="row input">
+  <div class="col-xs-9 col-s-10 col-11">Only One Card for Split Aces</div>
+  <div class="col-xs-3 col-s-2 col-1">
+    <label class="toggle-container" for="only1CardForSplitAces">
+      <input type="checkbox" id="only1CardForSplitAces" checked>
+      <span class="toggle"></span>
+    </label>
+  </div>
+</div>
+
+<div class="row input">
+  <div class="col-xs-9 col-s-10 col-11">Surrender Allowed</div>
+  <div class="col-xs-3 col-s-2 col-1">
+    <label class="toggle-container" for="surrenderAllowed">
+      <input type="checkbox" id="surrenderAllowed" checked>
+      <span class="toggle"></span>
+    </label>
+  </div>
+</div>
+
+<div class="row input">
+  <div class="col-xs-9 col-s-10 col-11">Verify Basic Strategy</div>
+  <div class="col-xs-3 col-s-2 col-1">
+    <label class="toggle-container" for="verifyBasicStrategy">
+      <input type="checkbox" id="verifyBasicStrategy" checked>
+      <span class="toggle"></span>
+    </label>
+  </div>
+</div>
+
+
+</body>
+</html>
