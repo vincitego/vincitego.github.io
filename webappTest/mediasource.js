@@ -239,7 +239,8 @@ async function init() {
 		inputFileSlider.value = 1;
 		inputFileIndex.innerHTML = 1;
 
-		loadImg();
+		if (inputHideShow.value == 'Hide')
+			loadImg();
 	};
 
 
