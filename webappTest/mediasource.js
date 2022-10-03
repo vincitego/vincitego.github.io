@@ -62,7 +62,7 @@ if (passedURL) {
 init();
 
 
-function init() {
+async function init() {
 	const inputHideShow = document.getElementById('hideShow');
 	const inputFullscreen = document.getElementById('fullscreen');
 	const inputFiles = document.getElementById('fileInput');
@@ -73,6 +73,85 @@ function init() {
 	const vidOutput = document.getElementById('vidOutput');
 	const inputSlideshow = document.getElementById('slideshow');
 	const inputSlideDuration = document.getElementById('slideDuration');
+	const cacheListing = document.getElementById('cacheListing');
+
+
+	const cache = await caches.open('assets');
+	const cacheKeys = await cache.keys();
+
+	const cacheFolders = cacheKeys.reduce((acc, req) => {
+		const url = new URL(req.url);
+		const paths = decodeURI(url.pathname).split('/');
+		const fileName = paths.at(-1);
+		const indexString = fileName.match(/\d{6}/)[0];
+		const keyword = fileName.match(/(.+) \d{6}.png|\d{6} (.+).png/)[1];
+
+		const category = paths[2];
+		const key = category === 'S' ? paths.join('/') : paths.slice(0, -1).join('/');
+
+		if (acc.has(key)) {
+			const data = acc.get(key);
+
+			if (data.has(keyword)) {
+				const dataIndex = data.get(keyword);
+				const index = Number(indexString);
+
+				if (index > dataIndex)
+					data.set(keyword, index);
+
+			} else {
+				data.set(keyword, Number(indexString));
+			}
+
+		} else {
+			const data = new Map();
+			acc.set(key, data);
+
+			if (category !== 'S')
+				data.set(keyword, Number(indexString));
+		}
+
+		return acc;
+	}, new Map());
+	
+	for (const [folder, data] of cacheFolders) {
+		const dataArray = [...data.entries()].sort((a, b) => a[1] - b[1]);
+		const url = `/webappTest/steg.html?url=${encodeURI(folder)}&data=${encodeURI(JSON.stringify(dataArray))}`;
+		const div = document.createElement('div');
+
+		const anchor = document.createElement('a');
+		anchor.textContent = folder;
+		anchor.href = url;
+		div.append(anchor);
+
+		const deleteButton = document.createElement('button');
+		deleteButton.textContent = 'Delete';
+		deleteButton.addEventListener('click', async () => {
+			let currentIndex = 1;
+
+			if (folder.toLocaleLowerCase().endsWith('.png')) {
+				const didDelete = await cache.delete(folder);
+				console.log(didDelete);
+			}
+
+			for (const [keyword, maxIndex] of dataArray) {
+				for (let i = currentIndex; i <= maxIndex; i++) {
+					const didDelete = await cache.delete(`${folder}/${keyword} ${i.toString().padStart(6, '0')}.png`);
+					
+					if (!didDelete) {
+						cache.delete(`${folder}/${i.toString().padStart(6, '0')} ${keyword}.png`);
+					}
+				}
+
+				currentIndex = maxIndex + 1;
+			}
+			
+			div.remove();
+		});
+		div.append(deleteButton);
+
+		cacheListing.append(div);
+	}
 
 
 	inputFileSlider.oninput = function() {
@@ -431,6 +510,25 @@ function onUpdateEnd(_) {
 
 
 function getFileData(i) {
+	const cacheCheckbox = document.getElementById('cacheCheckbox').checked;
+	const cacheCategory = document.getElementById('cacheCategory').value;
+	const cacheFolder = document.getElementById('cacheFolder').value;
+
+	if (cacheCheckbox && (cacheCategory === 'S' || cacheFolder)) {
+		caches.open('assets').then(async cache => {
+			const url = `/assets/${cacheCategory}${cacheCategory === 'S' ? '' : `/${cacheFolder}`}/${files[i].name}`;
+			const hasMatch = await cache.match(url);
+
+			if (!hasMatch) {
+				const request = new Request(url);
+				const response = new Response(files[i], { status: 200, statusText: 'OK' });
+				response.headers.set('content-length', files[i].size);
+				response.headers.set("content-type", "image/png");
+				cache.put(request, response);
+			}
+		});
+	}
+
 	return new Promise(function(resolve, reject) {
 		const img = new Image;
 		const imgObjectURL = URL.createObjectURL(files[i]);
