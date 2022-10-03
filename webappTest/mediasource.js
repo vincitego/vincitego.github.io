@@ -74,6 +74,8 @@ async function init() {
 	const inputSlideshow = document.getElementById('slideshow');
 	const inputSlideDuration = document.getElementById('slideDuration');
 	const cacheListing = document.getElementById('cacheListing');
+	const cacheStatus = document.getElementById('cacheStatus');
+	const cacheButton = document.getElementById('cacheButton');
 
 
 	const cache = await caches.open('assets');
@@ -84,7 +86,9 @@ async function init() {
 		const paths = decodeURI(url.pathname).split('/');
 		const fileName = paths.at(-1);
 		const indexString = fileName.match(/\d{6}/)[0];
-		const keyword = fileName.match(/(.+) \d{6}.png|\d{6} (.+).png/)[1];
+		const keywords = fileName.match(/(.+) \d{6}.png|\d{6} (.+).png/);
+		const keyword = keywords[1] ?? keywords[2];
+		const prependNumber = keywords[2] ? 1 : undefined;
 
 		const category = paths[2];
 		const key = category === 'S' ? paths.join('/') : paths.slice(0, -1).join('/');
@@ -107,6 +111,9 @@ async function init() {
 			const data = new Map();
 			acc.set(key, data);
 
+			if (prependNumber)
+				data.set('prepend', prependNumber);
+
 			if (category !== 'S')
 				data.set(keyword, Number(indexString));
 		}
@@ -114,19 +121,22 @@ async function init() {
 		return acc;
 	}, new Map());
 	
-	for (const [folder, data] of cacheFolders) {
-		const dataArray = [...data.entries()].sort((a, b) => a[1] - b[1]);
-		const url = `/webappTest/steg.html?url=${encodeURI(folder)}&data=${encodeURI(JSON.stringify(dataArray))}`;
+	for (const [folder, data] of [...cacheFolders.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+		const dataEntries = [...data.entries()];
+		const prependNumber = dataEntries.find(([key]) => key === 'prepend');
+		const dataArray = dataEntries.filter(([key]) => key !== 'prepend').sort((a, b) => a[1] - b[1]);
+		const url = `/webappTest/steg.html?url=${encodeURI(folder)}&data=${encodeURI(JSON.stringify(dataArray))}${prependNumber ? '&prepend=1' : ''}`;
 		const div = document.createElement('div');
 
 		const anchor = document.createElement('a');
-		anchor.textContent = folder;
+		anchor.textContent = folder + ' ';
 		anchor.href = url;
 		div.append(anchor);
 
 		const deleteButton = document.createElement('button');
 		deleteButton.textContent = 'Delete';
 		deleteButton.addEventListener('click', async () => {
+			if (!confirm('Confirm Delete?')) return;
 			let currentIndex = 1;
 
 			if (folder.toLocaleLowerCase().endsWith('.png')) {
@@ -152,6 +162,28 @@ async function init() {
 
 		cacheListing.append(div);
 	}
+
+	cacheButton.addEventListener('click', () => {
+		const cacheCategory = document.getElementById('cacheCategory').value;
+		const cacheFolder = document.getElementById('cacheFolder').value;
+		if (cacheCategory !== 'S' && !cacheFolder) return;
+		
+		caches.open('assets').then(async cache => {
+			for (let i = 0; i < files.length; i++) {
+				const url = `/assets/${cacheCategory}${cacheCategory === 'S' ? '' : `/${cacheFolder}`}/${files[i].name}`;
+				const hasMatch = await cache.match(url);
+				if (hasMatch) continue;
+
+				const request = new Request(url);
+				const response = new Response(files[i], { status: 200, statusText: 'OK' });
+				response.headers.set('content-length', files[i].size);
+				response.headers.set("content-type", "image/png");
+				await cache.put(request, response);
+
+				cacheStatus.textContent = `${i + 1} / ${files.length}`;
+			}
+		});
+	});
 
 
 	inputFileSlider.oninput = function() {
@@ -510,25 +542,6 @@ function onUpdateEnd(_) {
 
 
 function getFileData(i) {
-	const cacheCheckbox = document.getElementById('cacheCheckbox').checked;
-	const cacheCategory = document.getElementById('cacheCategory').value;
-	const cacheFolder = document.getElementById('cacheFolder').value;
-
-	if (cacheCheckbox && (cacheCategory === 'S' || cacheFolder)) {
-		caches.open('assets').then(async cache => {
-			const url = `/assets/${cacheCategory}${cacheCategory === 'S' ? '' : `/${cacheFolder}`}/${files[i].name}`;
-			const hasMatch = await cache.match(url);
-
-			if (!hasMatch) {
-				const request = new Request(url);
-				const response = new Response(files[i], { status: 200, statusText: 'OK' });
-				response.headers.set('content-length', files[i].size);
-				response.headers.set("content-type", "image/png");
-				cache.put(request, response);
-			}
-		});
-	}
-
 	return new Promise(function(resolve, reject) {
 		const img = new Image;
 		const imgObjectURL = URL.createObjectURL(files[i]);
