@@ -57,11 +57,11 @@ document.getElementById('form').addEventListener('submit', e => {
   e.preventDefault();
   
   if (inputURL.value.startsWith('http')) {
-    window.location.href = inputURL.value;
+    window.location.assign(inputURL.value);
   } else if (inputURL.value.startsWith('/')) {
-    window.location.href = document.location.origin + inputURL.value;
+    window.location.assign(document.location.origin + inputURL.value);
   } else {
-    window.location.href = document.location.origin + '/' + inputURL.value;
+    window.location.assign(document.location.origin + '/' + inputURL.value);
   }
 });
 

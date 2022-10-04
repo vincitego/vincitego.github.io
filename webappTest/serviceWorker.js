@@ -1,4 +1,4 @@
-const version = '0.14';
+const version = '0.15';
 //const domain = 'http://127.0.0.1:5500';
 const domain = 'https://vincitego.github.io';
 
