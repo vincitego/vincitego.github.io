@@ -3,6 +3,9 @@ if ("serviceWorker" in navigator) {
 		console.error("Service Worker failed to register");
 		console.error(err.stack);
 	});
+
+	const broadcast = new BroadcastChannel('sw');
+	broadcast.onmessage = event => alert(event.data);
 }
 
 
@@ -53,8 +56,6 @@ if (passedURL) {
 	inputFileSlider.value = 1;
 	inputFileSlider.disabled = true;
 	inputFileIndex.innerHTML = 1;
-
-	document.getElementById('hideShow').value = 'Show';
 	clearAll();
 }
 
@@ -225,110 +226,114 @@ async function init() {
 	inputSlideDuration.value = localStorage.slideDuration ?? 10;
 
 
-	const cache = await caches.open('assets');
-	const cacheKeys = await cache.keys();
+	const cacheNames = await caches.keys();
 
-	const cacheFolders = cacheKeys.reduce((acc, req) => {
-		const url = new URL(req.url);
-		const paths = decodeURI(url.pathname).split('/');
-		const fileName = paths.at(-1);
-		const indexString = fileName.match(/\d{6}/)[0];
-		const keywords = fileName.match(/(.+) \d{6}.png|\d{6} (.+).png/);
-		const keyword = keywords[1] ?? keywords[2];
-		const prependNumber = keywords[2] ? 1 : undefined;
+	for (const cacheName of cacheNames.filter(cacheName => cacheName.startsWith('assets_'))) {
+		const cache = await caches.open(cacheName);
+		const cacheKeys = await cache.keys();
 
-		const category = paths[2];
-		const key = category === 'S' ? paths.join('/') : paths.slice(0, -1).join('/');
+		const cacheFolders = cacheKeys.reduce((acc, req) => {
+			const url = new URL(req.url);
+			const paths = decodeURI(url.pathname).split('/');
+			const fileName = paths.at(-1);
+			const indexString = fileName.match(/\d{6}/)[0];
+			const keywords = fileName.match(/(.+) \d{6}.png|\d{6} (.+).png/);
+			const keyword = keywords[1] ?? keywords[2];
+			const prependNumber = keywords[2] ? 1 : undefined;
 
-		if (acc.has(key)) {
-			const data = acc.get(key);
+			const category = paths[2];
+			const key = category === 'S' ? paths.join('/') : paths.slice(0, -1).join('/');
 
-			if (data.has(keyword)) {
-				const dataIndex = data.get(keyword);
-				const index = Number(indexString);
+			if (acc.has(key)) {
+				const data = acc.get(key);
 
-				if (index > dataIndex)
-					data.set(keyword, index);
+				if (data.has(keyword)) {
+					const dataIndex = data.get(keyword);
+					const index = Number(indexString);
 
-			} else {
-				data.set(keyword, Number(indexString));
-			}
+					if (index > dataIndex)
+						data.set(keyword, index);
 
-		} else {
-			const data = new Map();
-			acc.set(key, data);
-
-			if (prependNumber)
-				data.set('prepend', prependNumber);
-
-			if (category !== 'S')
-				data.set(keyword, Number(indexString));
-		}
-
-		return acc;
-	}, new Map());
-	
-	for (const [folder, data] of [...cacheFolders.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
-		const dataEntries = [...data.entries()];
-		const prependNumber = dataEntries.find(([key]) => key === 'prepend');
-		const dataArray = dataEntries.filter(([key]) => key !== 'prepend').sort((a, b) => a[1] - b[1]);
-		const url = `/webappTest/steg.html?url=${encodeURI(folder)}&data=${encodeURI(JSON.stringify(dataArray))}${prependNumber ? '&prepend=1' : ''}`;
-
-		const div = document.createElement('div');
-		div.textContent = folder + ' ';
-		div.addEventListener('click', () => window.location.assign(url));
-
-		const deleteButton = document.createElement('button');
-		deleteButton.textContent = 'Delete';
-		deleteButton.addEventListener('click', async () => {
-			if (!confirm('Confirm Delete?')) return;
-			let currentIndex = 1;
-
-			if (folder.toLocaleLowerCase().endsWith('.png')) {
-				const didDelete = await cache.delete(folder);
-				console.log(didDelete);
-			}
-
-			for (const [keyword, maxIndex] of dataArray) {
-				for (let i = currentIndex; i <= maxIndex; i++) {
-					const didDelete = await cache.delete(`${folder}/${keyword} ${i.toString().padStart(6, '0')}.png`);
-					
-					if (!didDelete) {
-						await cache.delete(`${folder}/${i.toString().padStart(6, '0')} ${keyword}.png`);
-					}
+				} else {
+					data.set(keyword, Number(indexString));
 				}
 
-				currentIndex = maxIndex + 1;
+			} else {
+				const data = new Map();
+				acc.set(key, data);
+
+				if (prependNumber)
+					data.set('prepend', prependNumber);
+
+				if (category !== 'S')
+					data.set(keyword, Number(indexString));
 			}
-			
-			div.remove();
-		});
-		div.append(deleteButton);
 
-		cacheListing.append(div);
-	}
-
-	cacheButton.addEventListener('click', () => {
-		const cacheCategory = document.getElementById('cacheCategory').value;
-		const cacheFolder = document.getElementById('cacheFolder').value;
-		if (cacheCategory !== 'S' && !cacheFolder) return;
+			return acc;
+		}, new Map());
 		
-		caches.open('assets').then(async cache => {
-			for (let i = 0; i < files.length; i++) {
-				const url = `/assets/${cacheCategory}${cacheCategory === 'S' ? '' : `/${cacheFolder}`}/${files[i].name}`;
-				const hasMatch = await cache.match(url);
-				if (hasMatch) continue;
+		for (const [folder, data] of [...cacheFolders.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+			const dataEntries = [...data.entries()];
+			const prependNumber = dataEntries.find(([key]) => key === 'prepend');
+			const dataArray = dataEntries.filter(([key]) => key !== 'prepend').sort((a, b) => a[1] - b[1]);
+			const url = `/webappTest/steg.html?url=${encodeURI(folder)}&data=${encodeURI(JSON.stringify(dataArray))}${prependNumber ? '&prepend=1' : ''}`;
 
-				const request = new Request(url);
-				const response = new Response(files[i], { status: 200, statusText: 'OK' });
-				response.headers.set('content-length', files[i].size);
-				response.headers.set("content-type", "image/png");
-				await cache.put(request, response);
+			const div = document.createElement('div');
+			div.textContent = folder + ' ';
+			div.addEventListener('click', () => window.location.assign(url));
 
-				cacheStatus.textContent = `${i + 1} / ${files.length}`;
-			}
+			const deleteButton = document.createElement('button');
+			deleteButton.textContent = 'Delete';
+			deleteButton.addEventListener('click', async () => {
+				if (!confirm('Confirm Delete?')) return;
+				let currentIndex = 1;
+
+				if (folder.toLocaleLowerCase().endsWith('.png')) {
+					const didDelete = await cache.delete(folder);
+					console.log(didDelete);
+				}
+
+				for (const [keyword, maxIndex] of dataArray) {
+					for (let i = currentIndex; i <= maxIndex; i++) {
+						const didDelete = await cache.delete(`${folder}/${keyword} ${i.toString().padStart(6, '0')}.png`);
+						
+						if (!didDelete) {
+							await cache.delete(`${folder}/${i.toString().padStart(6, '0')} ${keyword}.png`);
+						}
+					}
+
+					currentIndex = maxIndex + 1;
+				}
+				
+				div.remove();
+			});
+			div.append(deleteButton);
+
+			cacheListing.append(div);
+		}
+
+		cacheButton.addEventListener('click', () => {
+			const cacheCategory = document.getElementById('cacheCategory').value;
+			const cacheFolder = document.getElementById('cacheFolder').value;
+			if (cacheCategory !== 'S' && !cacheFolder) return;
+			
+			caches.open(cacheName).then(async cache => {
+				for (let i = 0; i < files.length; i++) {
+					const url = `/assets/${cacheCategory}${cacheCategory === 'S' ? '' : `/${cacheFolder}`}/${files[i].name}`;
+					const hasMatch = await cache.match(url);
+					if (hasMatch) continue;
+
+					const request = new Request(url);
+					const response = new Response(files[i], { status: 200, statusText: 'OK' });
+					response.headers.set('content-length', files[i].size);
+					response.headers.set("content-type", "image/png");
+					await cache.put(request, response);
+
+					cacheStatus.textContent = `${i + 1} / ${files.length}`;
+				}
+			});
 		});
-	});
+	}
 }
 
 

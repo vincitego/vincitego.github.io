@@ -1,4 +1,4 @@
-const version = '0.15';
+const version = '0.16';
 //const domain = 'http://127.0.0.1:5500';
 const domain = 'https://vincitego.github.io';
 
@@ -47,15 +47,45 @@ self.addEventListener("install", e => {
 
 self.addEventListener('activate', e => {
     // clean up from old version of service worker
-    e.waitUntil(caches.delete('static'));
+    e.waitUntil((async () => {
+        const regex = /assets\/(.)\/([^\/]+)/;
+        const assetCache = await caches.open('assets');
+        const cacheKeys = await assetCache.keys();
+
+        for (const cacheKey of cacheKeys) {
+            const response = await assetCache.match(cacheKey);
+            const [_, category, folder] = cacheKey.url.match(regex);
+
+            const newCacheName = `assets_${category}_${category === 'S' ? '' : folder}`;
+            const newCache = await caches.open(newCacheName);
+            await newCache.put(cacheKey, response);
+            await assetCache.delete(cacheKey);
+        }
+        
+        await caches.delete('assets');
+        const broadcast = new BroadcastChannel('sw');
+        broadcast.postMessage('Cache cleanup completed.');
+    })());
 });
 
 
 self.addEventListener('fetch', e => {
     e.respondWith((async () => {
+        const regex = /https:\/\/vincitego.github.io\/assets\/(.)\/([^\/]+)/;
         const url = e.request.url;
-        const response = await caches.match(url, { ignoreSearch: true });
-        if (response) return response;
+        const [_, category, folder] = url.match(regex) ?? [null, null, null];
+        const cacheName = `assets_${category}_${category === 'S' ? '' : folder}`;
+
+        if (await caches.has(cacheName)) {
+            const cache = await caches.open(cacheName);
+            const response = await cache.match(url, { ignoreSearch: true });
+            if (response) return response;
+        } else {
+            const cache = await caches.open('static-test');
+            const response = await cache.match(url, { ignoreSearch: true });
+            if (response) return response;
+        }
+
         if (!url.startsWith(domain)) return fetch(url);
 
         try {
