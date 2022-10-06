@@ -33,22 +33,27 @@ const fileTypes = {
 
 
 const searchParams = new URLSearchParams(window.location.search);
-const passedURL = searchParams.get('url');
 const passedData = JSON.parse(searchParams.get('data'));
 const prependNumber = Number(searchParams.get('prepend'));
-const directoryData = [];
+let directoryData = [];
 
-if (passedURL) {
-	let passedDataIndex = 1;
-	passedData.map(([keyword, endIndex]) => {
-		for (; passedDataIndex <= endIndex; passedDataIndex++) {
-			if (prependNumber === 1) {
-				directoryData.push(`${passedURL}/${passedDataIndex.toString().padStart(6, '0')} ${keyword}.png`);
-			} else {
-				directoryData.push(`${passedURL}/${keyword} ${passedDataIndex.toString().padStart(6, '0')}.png`);
+function loadCacheData (url, data, prependNumber) {
+	directoryData = [];
+
+	if (data.length) {
+		let passedDataIndex = 1;
+		data.forEach(([keyword, endIndex]) => {
+			for (; passedDataIndex <= endIndex; passedDataIndex++) {
+				if (prependNumber === 1) {
+					directoryData.push(`${url}/${passedDataIndex.toString().padStart(6, '0')} ${keyword}.png`);
+				} else {
+					directoryData.push(`${url}/${keyword} ${passedDataIndex.toString().padStart(6, '0')}.png`);
+				}
 			}
-		}
-	});
+		});
+	} else {
+		directoryData.push(url);
+	}
 
 	const inputFileSlider = document.getElementById('fileSlider');
 	const inputFileIndex = document.getElementById('fileIndex');
@@ -226,6 +231,30 @@ async function init() {
 	inputSlideDuration.value = localStorage.slideDuration ?? 10;
 
 
+	cacheButton.addEventListener('click', () => {
+		const cacheCategory = document.getElementById('cacheCategory').value;
+		const cacheFolder = document.getElementById('cacheFolder').value;
+		const cacheName = `assets_${cacheCategory}_${encodeURI(cacheFolder)}`;
+		if (cacheCategory !== 'S' && !cacheFolder) return;
+		
+		caches.open(cacheName).then(async cache => {
+			for (let i = 0; i < files.length; i++) {
+				const url = `/assets/${cacheCategory}${cacheCategory === 'S' ? '' : `/${cacheFolder}`}/${files[i].name}`;
+				const hasMatch = await cache.match(url);
+				if (hasMatch) continue;
+
+				const request = new Request(url);
+				const response = new Response(files[i], { status: 200, statusText: 'OK' });
+				response.headers.set('content-length', files[i].size);
+				response.headers.set("content-type", "image/png");
+				await cache.put(request, response);
+
+				cacheStatus.textContent = `${i + 1} / ${files.length}`;
+			}
+		});
+	});
+
+
 	const cacheNames = (await caches.keys())
 		.filter(cacheName => cacheName.startsWith('assets'))
 		.sort();
@@ -278,11 +307,10 @@ async function init() {
 			const dataEntries = [...data.entries()];
 			const prependNumber = dataEntries.find(([key]) => key === 'prepend');
 			const dataArray = dataEntries.filter(([key]) => key !== 'prepend').sort((a, b) => a[1] - b[1]);
-			const url = `/webappTest/steg.html?url=${encodeURI(folder)}&data=${encodeURI(JSON.stringify(dataArray))}${prependNumber ? '&prepend=1' : ''}`;
 
 			const div = document.createElement('div');
 			div.textContent = folder + ' ';
-			div.addEventListener('click', () => window.location.assign(url));
+			div.addEventListener('click', () => loadCacheData(folder, dataArray, prependNumber));
 
 			const deleteButton = document.createElement('button');
 			deleteButton.textContent = 'Delete';
@@ -313,34 +341,12 @@ async function init() {
 
 			cacheListing.append(div);
 		}
-
-		cacheButton.addEventListener('click', () => {
-			const cacheCategory = document.getElementById('cacheCategory').value;
-			const cacheFolder = document.getElementById('cacheFolder').value;
-			if (cacheCategory !== 'S' && !cacheFolder) return;
-			
-			caches.open(cacheName).then(async cache => {
-				for (let i = 0; i < files.length; i++) {
-					const url = `/assets/${cacheCategory}${cacheCategory === 'S' ? '' : `/${cacheFolder}`}/${files[i].name}`;
-					const hasMatch = await cache.match(url);
-					if (hasMatch) continue;
-
-					const request = new Request(url);
-					const response = new Response(files[i], { status: 200, statusText: 'OK' });
-					response.headers.set('content-length', files[i].size);
-					response.headers.set("content-type", "image/png");
-					await cache.put(request, response);
-
-					cacheStatus.textContent = `${i + 1} / ${files.length}`;
-				}
-			});
-		});
 	}
 }
 
 
 async function loadImg() {
-	if (files.length == 0 && !passedURL) return;
+	if (files.length == 0 && !directoryData.length) return;
 
 	const txtOutput = document.getElementById('txtOutput');
 	const imgOutput = document.getElementById('imgOutput');
@@ -353,7 +359,7 @@ async function loadImg() {
 	try {
 		if (files.length > 0) {
 			[fileType, objBuffer] = await getFileData(fileIndex);
-		} else if (passedURL) {
+		} else if (directoryData.length) {
 			[fileType, objBuffer] = await fetchFileData(fileIndex);
 		}
 	} catch (err) {
@@ -492,7 +498,7 @@ async function loadVideoData() {
 
 			if (files.length > 0) {
 				[fileType, chunk] = await getFileData(fileIndex);
-			} else if (passedURL) {
+			} else if (directoryData.length) {
 				[fileType, chunk] = await fetchFileData(fileIndex);
 			}
 
@@ -587,11 +593,7 @@ function fetchFileData(i) {
 			}
 		};
 
-		if (passedURL.toLocaleLowerCase().endsWith('.png')) {
-			img.src = passedURL;
-		} else {
-			img.src = directoryData[i];
-		}
+		img.src = directoryData[i];
 	});
 }
 

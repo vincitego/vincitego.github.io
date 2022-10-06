@@ -1,6 +1,8 @@
-const version = '0.16';
+const version = '0.18';
 //const domain = 'http://127.0.0.1:5500';
 const domain = 'https://vincitego.github.io';
+
+const regex = new RegExp(`${domain}\/assets\/(.)\/([^\/]+)`);
 
 
 self.addEventListener("install", e => {
@@ -35,7 +37,7 @@ self.addEventListener("install", e => {
             './icons/apple-splash-2208-1242.jpg',
             './icons/apple-splash-2224-1668.jpg',
             './icons/apple-splash-2388-1668.jpg',
-            './icons/apple-splash-2436-1125.jpg',
+           './icons/apple-splash-2436-1125.jpg',
             './icons/apple-splash-2532-1170.jpg',
             './icons/apple-splash-2688-1242.jpg',
             './icons/apple-splash-2732-2048.jpg',
@@ -70,7 +72,6 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
     e.respondWith((async () => {
-        const regex = /https:\/\/vincitego.github.io\/assets\/(.)\/([^\/]+)/;
         const url = e.request.url;
         const [_, category, folder] = url.match(regex) ?? [null, null, null];
         const cacheName = `assets_${category}_${category === 'S' ? '' : folder}`;
