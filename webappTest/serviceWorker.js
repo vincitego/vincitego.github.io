@@ -62,9 +62,8 @@ self.addEventListener('activate', e => {
             await assetCache.delete(cacheKey);
         }
         
-        await caches.delete('assets');
-        const broadcast = new BroadcastChannel('sw');
-        broadcast.postMessage('Cache cleanup completed.');
+        if ((await assetCache.keys()).length === 0)
+            await caches.delete('assets');
     })());
 });
 

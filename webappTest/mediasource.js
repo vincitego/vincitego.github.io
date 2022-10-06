@@ -226,9 +226,11 @@ async function init() {
 	inputSlideDuration.value = localStorage.slideDuration ?? 10;
 
 
-	const cacheNames = await caches.keys();
+	const cacheNames = (await caches.keys())
+		.filter(cacheName => cacheName.startsWith('assets'))
+		.sort();
 
-	for (const cacheName of cacheNames.filter(cacheName => cacheName.startsWith('assets_'))) {
+	for (const cacheName of cacheNames) {
 		const cache = await caches.open(cacheName);
 		const cacheKeys = await cache.keys();
 
