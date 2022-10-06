@@ -3,9 +3,6 @@ if ("serviceWorker" in navigator) {
 		console.error("Service Worker failed to register");
 		console.error(err.stack);
 	});
-
-	const broadcast = new BroadcastChannel('sw');
-	broadcast.onmessage = event => alert(event.data);
 }
 
 
@@ -32,9 +29,6 @@ const fileTypes = {
 };
 
 
-const searchParams = new URLSearchParams(window.location.search);
-const passedData = JSON.parse(searchParams.get('data'));
-const prependNumber = Number(searchParams.get('prepend'));
 let directoryData = [];
 
 function loadCacheData (url, data, prependNumber) {
@@ -305,12 +299,15 @@ async function init() {
 		
 		for (const [folder, data] of [...cacheFolders.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
 			const dataEntries = [...data.entries()];
-			const prependNumber = dataEntries.find(([key]) => key === 'prepend');
+			const prependNumber = dataEntries.find(([key]) => key === 'prepend') ? 1 : 0;
 			const dataArray = dataEntries.filter(([key]) => key !== 'prepend').sort((a, b) => a[1] - b[1]);
 
 			const div = document.createElement('div');
 			div.textContent = folder + ' ';
-			div.addEventListener('click', () => loadCacheData(folder, dataArray, prependNumber));
+			div.addEventListener('click', () => {
+				if (confirm(`Load ${folder}?`))
+					loadCacheData(folder, dataArray, prependNumber);
+			});
 
 			const deleteButton = document.createElement('button');
 			deleteButton.textContent = 'Delete';
@@ -718,6 +715,7 @@ async function deriveKey(strPW, salt, algo) {
 
 function clearAll() {
 	document.getElementById('password').value = '';
+	document.getElementById('hideShow').value = 'Show';
 	clearText();
 	clearImage();
 	clearVideo();

@@ -49,9 +49,6 @@ if ("serviceWorker" in navigator) {
       console.error("Service Worker failed to register");
       console.error(err.stack);
   });
-  
-	const broadcast = new BroadcastChannel('sw');
-	broadcast.onmessage = event => alert(event.data);
 }
 
 const inputURL = document.getElementById('url');
