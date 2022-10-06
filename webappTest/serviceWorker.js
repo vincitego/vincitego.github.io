@@ -4,6 +4,9 @@ const domain = 'vincitego.github.io';
 
 const regex = new RegExp(`${domain}\/assets\/(.)\/([^\/]+)`);
 
+const broadcast = new BroadcastChannel('version');
+broadcast.postMessage(version);
+
 
 self.addEventListener("install", e => {
     e.waitUntil((async () => {

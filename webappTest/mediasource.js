@@ -51,10 +51,15 @@ function loadCacheData (url, data, prependNumber) {
 
 	const inputFileSlider = document.getElementById('fileSlider');
 	const inputFileIndex = document.getElementById('fileIndex');
+	const maxFileIndex = document.getElementById('maxFileIndex');
+	const loadedFromCache = document.getElementById('loadedFromCache');
+
+	loadedFromCache.textContent = url;
 	inputFileSlider.max = directoryData.length;
 	inputFileSlider.value = 1;
 	inputFileSlider.disabled = true;
-	inputFileIndex.innerHTML = 1;
+	inputFileIndex.textContent = 1;
+	maxFileIndex.textContent = directoryData.length;
 	clearAll();
 }
 
@@ -66,9 +71,9 @@ async function init() {
 	const inputHideShow = document.getElementById('hideShow');
 	const inputFullscreen = document.getElementById('fullscreen');
 	const inputFiles = document.getElementById('fileInput');
-	const inputFiles2 = document.getElementById('fileInput2');
 	const inputFileSlider = document.getElementById('fileSlider');
 	const inputFileIndex = document.getElementById('fileIndex');
+	const maxFileIndex = document.getElementById('maxFileIndex');
 	const imgOutput = document.getElementById('imgOutput');
 	const vidOutput = document.getElementById('vidOutput');
 	const inputSlideshow = document.getElementById('slideshow');
@@ -76,10 +81,11 @@ async function init() {
 	const cacheListing = document.getElementById('cacheListing');
 	const cacheStatus = document.getElementById('cacheStatus');
 	const cacheButton = document.getElementById('cacheButton');
+	const loadedFromCache = document.getElementById('loadedFromCache');
 
 
 	inputFileSlider.oninput = function() {
-		inputFileIndex.innerHTML = this.value;
+		inputFileIndex.textContent = this.value;
 	};
 
 
@@ -108,9 +114,8 @@ async function init() {
 		}
 
 		loadingData = false;
-		clearText();
-		clearImage();
-		clearVideo();
+		loadedFromCache.textContent = '';
+		clearAll();
 		await sleep(1000);
 
 
@@ -127,30 +132,13 @@ async function init() {
 		});
 
 		fileIndex = 0;
+		maxFileIndex.textContent = files.length;
 		inputFileSlider.max = files.length;
 		inputFileSlider.value = 1;
-		inputFileIndex.innerHTML = 1;
+		inputFileIndex.textContent = 1;
 
 		if (inputHideShow.value == 'Hide')
 			loadImg();
-	};
-
-
-	inputFiles2.onchange = async e => {
-		const newFiles = [];
-
-		for (let i = 0; i < e.target.files.length; i++) {
-			newFiles.push(e.target.files[i]);
-		}
-
-		newFiles.sort((a, b) => {
-			if (a.name > b.name) return 1;
-			if (a.name < b.name) return -1;
-			return 0;
-		});
-
-		files.push(...newFiles);
-		inputFileSlider.max = files.length;
 	};
 
 
@@ -174,7 +162,7 @@ async function init() {
 
 		if (fileIndex != prevIndex) {
 			inputFileSlider.value = fileIndex + 1;
-			inputFileIndex.innerHTML = fileIndex + 1;
+			inputFileIndex.textContent = fileIndex + 1;
 			resetSlideshowTimeout();
 		}
 	};
@@ -226,10 +214,13 @@ async function init() {
 
 
 	cacheButton.addEventListener('click', () => {
+		if (!confirm('Cache files?')) return;
+
 		const cacheCategory = document.getElementById('cacheCategory').value;
 		const cacheFolder = document.getElementById('cacheFolder').value;
 		const cacheName = `assets_${cacheCategory}_${encodeURI(cacheFolder)}`;
-		if (cacheCategory !== 'S' && !cacheFolder) return;
+
+		if ((cacheCategory !== 'S' && !cacheFolder) || files.length === 0) return alert('Invalid cache settings');
 		
 		caches.open(cacheName).then(async cache => {
 			for (let i = 0; i < files.length; i++) {
@@ -303,11 +294,18 @@ async function init() {
 			const dataArray = dataEntries.filter(([key]) => key !== 'prepend').sort((a, b) => a[1] - b[1]);
 
 			const div = document.createElement('div');
-			div.textContent = folder + ' ';
-			div.addEventListener('click', () => {
+
+			const loadButton = document.createElement('button');
+			loadButton.textContent = 'Load';
+			loadButton.addEventListener('click', () => {
 				if (confirm(`Load ${folder}?`))
 					loadCacheData(folder, dataArray, prependNumber);
 			});
+			div.append(loadButton)
+
+			const span = document.createElement('span');
+			span.textContent = ' ' + folder + ' ';
+			div.append(span);
 
 			const deleteButton = document.createElement('button');
 			deleteButton.textContent = 'Delete';
@@ -348,6 +346,7 @@ async function loadImg() {
 	const txtOutput = document.getElementById('txtOutput');
 	const imgOutput = document.getElementById('imgOutput');
 	const vidOutput = document.getElementById('vidOutput');
+	const inputFullscreen = document.getElementById('fullscreen');
 	const inputFileIndex = document.getElementById('fileIndex');
 	const inputFileSlider = document.getElementById('fileSlider');
 	const inputSlideshow = document.getElementById('slideshow');
@@ -372,7 +371,9 @@ async function loadImg() {
 		blobObjectURL = URL.createObjectURL(blob);
 
 		imgOutput.className = 'show';
+		vidOffset.className = '';
 		imgOutput.src = blobObjectURL;
+		inputFullscreen.disabled = false;
 		inputFileSlider.disabled = false;
 		inputSlideshow.disabled = false;
 		
@@ -384,7 +385,13 @@ async function loadImg() {
 	} else if (fileType == fileTypes.TEXT) {
 		const txtDecoder = new TextDecoder();
 		const text = txtDecoder.decode(new Uint8Array(objBuffer.buffer));
+
 		txtOutput.innerHTML = text.replace(/(?:\r\n|\r|\n)/g, '<br>');
+		imgOutput.className = '';
+		vidOutput.className = '';
+		inputFullscreen.disabled = false;
+		inputFileSlider.disabled = false;
+		inputSlideshow.disabled = false;
 
 		if (blobObjectURL !== null) URL.revokeObjectURL(blobObjectURL);
 		if (timeoutClear) clearTimeout(timeoutClear);
@@ -394,9 +401,11 @@ async function loadImg() {
 	} else if (fileType === fileTypes.VIDEO) {
 		vidBuffer = objBuffer.buffer;
 		fileIndex = 1;
-		inputFileIndex.innerHTML = 1;
+		inputFileIndex.textContent = 1;
+		imgOutput.className = '';
 		vidOutput.className = 'show';
 		vidOutput.muted = true;
+		inputFullscreen.disabled = true;
 		inputFileSlider.disabled = true;
 		inputSlideshow.disabled = true;
 
@@ -503,7 +512,7 @@ async function loadVideoData() {
 
 			fileIndex++;
 			inputFileSlider.value = fileIndex + 1;
-			inputFileIndex.innerHTML = fileIndex;
+			inputFileIndex.textContent = fileIndex;
 			objBuffer.fileStart = vidOffset;
 			vidOffset += objBuffer.byteLength;
 			if (fileType == fileTypes.VIDEO && loadingData) mp4boxfile.appendBuffer(objBuffer);
@@ -788,7 +797,7 @@ async function nextImageInSlideshow() {
 	if ((files.length && fileIndex < files.length - 1) || (directoryData.length && fileIndex < directoryData.length - 1)) {
 		fileIndex++;
 		inputFileSlider.value = fileIndex + 1;
-		inputFileIndex.innerHTML = fileIndex + 1;
+		inputFileIndex.textContent = fileIndex + 1;
 		await loadImg();
 		if (slideshowTimeout) clearTimeout(slideshowTimeout);
 		slideshowTimeout = setTimeout(nextImageInSlideshow, Number(inputSlideDuration.value) * 1000);
