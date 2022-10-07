@@ -51,7 +51,7 @@ if ("serviceWorker" in navigator) {
   });
 
   const broadcast = new BroadcastChannel('version');
-  broadcast.onmessage(e => document.getElementById('version').textContent = e.data);
+  broadcast.onmessage = e => document.getElementById('version').textContent = e.data ?? document.getElementById('version').textContent;
 }
 
 const inputURL = document.getElementById('url');
@@ -80,8 +80,8 @@ navigator.storage.estimate().then(data => document.getElementById('cacheUsage').
   <input type="submit" value="Redirect" />
 </form>
 
-Service Worker Version: <div id="version"></div>
-Cache Usage: <div id="cacheUsage"></div>
+<div>Service Worker Version: <span id="version"></span></div>
+<div>Cache Usage: <span id="cacheUsage"></span></div>
 
 </body>
 </html>
