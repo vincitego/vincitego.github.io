@@ -1,11 +1,8 @@
-const version = '0.20';
+const version = '0.21';
 //const domain = '127.0.0.1:5500';
 const domain = 'vincitego.github.io';
 
 const regex = new RegExp(`${domain}\/assets\/(.)\/([^\/]+)`);
-
-const broadcast = new BroadcastChannel('version');
-broadcast.postMessage(version);
 
 
 self.addEventListener("install", e => {
