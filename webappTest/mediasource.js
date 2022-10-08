@@ -337,7 +337,7 @@ async function init() {
 				anchor.download = `${folder}.tar`;
 				document.body.append(anchor);
 				anchor.click();
-				setTimeout(() => URL.revokeObjectURL(url), 0);
+				setTimeout(() => URL.revokeObjectURL(url), 60000);
 			});
 			div.append(downloadButton);
 

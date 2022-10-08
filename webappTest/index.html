@@ -49,6 +49,20 @@ if ("serviceWorker" in navigator) {
       console.error("Service Worker failed to register");
       console.error(err.stack);
   });
+
+  navigator.serviceWorker.ready.then(() => {
+    const broadcast = new BroadcastChannel('version');
+
+    broadcast.addEventListener('message', e => {
+      if (!e.data) return;
+
+      if (e.data.type === 'VERSION') {
+        document.getElementById('swVersion').textContent = e.data.version;
+      }
+    });
+
+    broadcast.postMessage({ type: 'GET_VERSION' });
+  })
 }
 
 const inputURL = document.getElementById('url');
@@ -77,6 +91,7 @@ navigator.storage.estimate().then(data => document.getElementById('cacheUsage').
   <input type="submit" value="Redirect" />
 </form>
 
+<div>Service Worker Version: <span id="swVersion"></span></div>
 <div>Cache Usage: <span id="cacheUsage"></span></div>
 
 </body>
