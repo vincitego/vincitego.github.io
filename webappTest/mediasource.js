@@ -292,8 +292,8 @@ async function init() {
 			const dataEntries = [...data.entries()];
 			const prependNumber = dataEntries.find(([key]) => key === 'prepend') ? 1 : 0;
 			const dataArray = dataEntries.filter(([key]) => key !== 'prepend').sort((a, b) => a[1] - b[1]);
-
 			const div = document.createElement('div');
+
 
 			const loadButton = document.createElement('button');
 			loadButton.textContent = 'Load';
@@ -303,9 +303,44 @@ async function init() {
 			});
 			div.append(loadButton)
 
+
 			const span = document.createElement('span');
 			span.textContent = ' ' + folder + ' ';
 			div.append(span);
+			
+
+			const downloadButton = document.createElement('button');
+			downloadButton.textContent = 'Download';
+			downloadButton.addEventListener('click', async () => {
+				if (!confirm('Download Folder?')) return;
+
+				const tar = new Tar;
+				let currentIndex = 1;
+
+				for (const [keyword, maxIndex] of dataArray) {
+					for (let i = currentIndex; i <= maxIndex; i++) {
+						const fileName = prependNumber === 1 ? `${i.toString().padStart(6, '0')} ${keyword}.png` : `${keyword} ${i.toString().padStart(6, '0')}.png`
+						const fileResponse = await cache.match(`${folder}/${fileName}`);
+
+						const fileBuffer = await fileResponse.arrayBuffer();						
+						const fileData = new Uint8Array(fileBuffer);
+						tar.addFile(fileName, fileData);
+					}
+
+					currentIndex = maxIndex + 1;
+				}
+
+				const url = URL.createObjectURL(tar.toBlob());
+				const anchor = document.createElement('a');
+				anchor.style.display = 'none';
+				anchor.href = url;
+				anchor.download = `${folder}.tar`;
+				document.body.append(anchor);
+				anchor.click();
+				setTimeout(() => URL.revokeObjectURL(url), 0);
+			});
+			div.append(downloadButton);
+
 
 			const deleteButton = document.createElement('button');
 			deleteButton.textContent = 'Delete';
@@ -314,22 +349,24 @@ async function init() {
 				let currentIndex = 1;
 
 				if (folder.toLocaleLowerCase().endsWith('.png')) {
-					const didDelete = await cache.delete(folder);
-					console.log(didDelete);
+					await cache.delete(folder);
 				}
 
 				for (const [keyword, maxIndex] of dataArray) {
 					for (let i = currentIndex; i <= maxIndex; i++) {
-						const didDelete = await cache.delete(`${folder}/${keyword} ${i.toString().padStart(6, '0')}.png`);
+						const didDelete = prependNumber === 1 ?
+							await cache.delete(`${folder}/${i.toString().padStart(6, '0')} ${keyword}.png`) :
+							await cache.delete(`${folder}/${keyword} ${i.toString().padStart(6, '0')}.png`);
 						
 						if (!didDelete) {
-							await cache.delete(`${folder}/${i.toString().padStart(6, '0')} ${keyword}.png`);
+							console.error('Failed to delete.');
 						}
 					}
 
 					currentIndex = maxIndex + 1;
 				}
 				
+				await caches.delete(cacheName);
 				div.remove();
 			});
 			div.append(deleteButton);
