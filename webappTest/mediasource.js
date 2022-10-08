@@ -346,27 +346,13 @@ async function init() {
 			deleteButton.textContent = 'Delete';
 			deleteButton.addEventListener('click', async () => {
 				if (!confirm('Confirm Delete?')) return;
-				let currentIndex = 1;
-
+				
 				if (folder.toLocaleLowerCase().endsWith('.png')) {
 					await cache.delete(folder);
-				}
-
-				for (const [keyword, maxIndex] of dataArray) {
-					for (let i = currentIndex; i <= maxIndex; i++) {
-						const didDelete = prependNumber === 1 ?
-							await cache.delete(`${folder}/${i.toString().padStart(6, '0')} ${keyword}.png`) :
-							await cache.delete(`${folder}/${keyword} ${i.toString().padStart(6, '0')}.png`);
-						
-						if (!didDelete) {
-							console.error('Failed to delete.');
-						}
-					}
-
-					currentIndex = maxIndex + 1;
-				}
-				
+				} else {
 				await caches.delete(cacheName);
+				}
+
 				div.remove();
 			});
 			div.append(deleteButton);
