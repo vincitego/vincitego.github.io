@@ -1,6 +1,6 @@
-const version = '0.24';
-//const domain = '127.0.0.1:5500';
-const domain = 'vincitego.github.io';
+const version = '0.25';
+//const domain = 'http://127.0.0.1:5500';
+const domain = 'https://vincitego.github.io';
 
 const regex = new RegExp(`${domain}\/assets\/(.)\/([^\/]+)`);
 

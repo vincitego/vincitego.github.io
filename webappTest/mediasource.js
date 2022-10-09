@@ -23,7 +23,7 @@ const fileTypes = {
 
 let directoryData = [];
 
-function loadCacheData (url, data, prependNumber) {
+function loadCacheData(url, data, prependNumber) {
 	directoryData = [];
 
 	if (data.length) {
@@ -322,24 +322,17 @@ async function init() {
 
 				const url = URL.createObjectURL(tar.toBlob());
 				const anchor = document.createElement('a');
+				anchor.style.display = 'none';
 				anchor.href = url;
 				anchor.textContent = 'Download Ready';
 				anchor.download = `${folder}.tar`;
 				div.append(anchor);
+				anchor.click();
 
 				setTimeout(() => {
 					URL.revokeObjectURL(url);
 					anchor.remove();
 				}, 60000);
-
-				const res = await caches.match('/assets/D/Valentine/000001%20Valentine.png');
-				const blob = await res.blob();
-				const bloburl = URL.createObjectURL(blob);
-				const link = document.createElement('a');
-				link.href = bloburl;
-				link.textContent = 'Test Download Ready';
-				link.download = `${folder}.png`;
-				document.body.append(link);
 			});
 			div.append(downloadButton);
 
