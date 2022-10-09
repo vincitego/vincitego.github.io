@@ -7,11 +7,14 @@
 	<link rel="stylesheet" type="text/css" href="index.css">
 </head>
 
+<script type="module" src="./swInit.js"></script>
 <script src="mp4box.all.js" defer type="text/javascript"></script>
 <script src="tar.js" defer type="text/javascript"></script>
 <script src="mediasource.js" defer type="text/javascript"></script>
 
 <body>
+	<div>Service Worker Version: <span id="swVersion"></span></div>
+	
 	<div>
 		<input type="button" id="hideShow" value="Show" />
 		<input type="password" id="password" />

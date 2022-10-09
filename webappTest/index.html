@@ -44,44 +44,25 @@
 
 <script type="module">
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./serviceWorker.js").catch(err => {
-      console.error("Service Worker failed to register");
-      console.error(err.stack);
+  const inputURL = document.getElementById('url');
+
+  document.getElementById('form').addEventListener('submit', e => {
+    e.preventDefault();
+    
+    if (inputURL.value.startsWith('http')) {
+      window.location.assign(inputURL.value);
+    } else if (inputURL.value.startsWith('/')) {
+      window.location.assign(document.location.origin + inputURL.value);
+    } else {
+      window.location.assign(document.location.origin + '/' + inputURL.value);
+    }
   });
 
-  navigator.serviceWorker.ready.then(() => {
-    const broadcast = new BroadcastChannel('version');
-
-    broadcast.addEventListener('message', e => {
-      if (!e.data) return;
-
-      if (e.data.type === 'VERSION') {
-        document.getElementById('swVersion').textContent = e.data.version;
-      }
-    });
-
-    broadcast.postMessage({ type: 'GET_VERSION' });
-  })
-}
-
-const inputURL = document.getElementById('url');
-
-document.getElementById('form').addEventListener('submit', e => {
-  e.preventDefault();
-  
-  if (inputURL.value.startsWith('http')) {
-    window.location.assign(inputURL.value);
-  } else if (inputURL.value.startsWith('/')) {
-    window.location.assign(document.location.origin + inputURL.value);
-  } else {
-    window.location.assign(document.location.origin + '/' + inputURL.value);
-  }
-});
-
-navigator.storage.estimate().then(data => document.getElementById('cacheUsage').textContent = `Used ${(data.usage / 1024 / 1024 / 1024).toFixed(2)} of ${(data.quota / 1024 / 1024 / 1024).toFixed(2)} GB`);
+  navigator.storage.estimate().then(data => document.getElementById('cacheUsage').textContent = `Used ${(data.usage / 1024 / 1024 / 1024).toFixed(2)} of ${(data.quota / 1024 / 1024 / 1024).toFixed(2)} GB`);
 
 </script>
+
+<script type="module" src="./swInit.js"></script>
 
 
 <body>

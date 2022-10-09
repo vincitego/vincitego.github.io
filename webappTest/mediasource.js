@@ -1,11 +1,3 @@
-if ("serviceWorker" in navigator) {
-	navigator.serviceWorker.register("./serviceWorker.js").catch(err => {
-		console.error("Service Worker failed to register");
-		console.error(err.stack);
-	});
-}
-
-
 /* MP4Box */
 const timeBeforeClear = 5 * 60000;
 let files = [];
@@ -332,12 +324,15 @@ async function init() {
 
 				const url = URL.createObjectURL(tar.toBlob());
 				const anchor = document.createElement('a');
-				anchor.style.display = 'none';
 				anchor.href = url;
+				anchor.textContent = 'Download Ready';
 				anchor.download = `${folder}.tar`;
-				document.body.append(anchor);
-				anchor.click();
-				setTimeout(() => URL.revokeObjectURL(url), 60000);
+				div.append(anchor);
+
+				setTimeout(() => {
+					URL.revokeObjectURL(url);
+					anchor.remove();
+				}, 60000);
 			});
 			div.append(downloadButton);
 
