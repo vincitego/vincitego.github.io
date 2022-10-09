@@ -313,9 +313,7 @@ async function init() {
 					for (let i = currentIndex; i <= maxIndex; i++) {
 						const fileName = prependNumber === 1 ? `${i.toString().padStart(6, '0')} ${keyword}.png` : `${keyword} ${i.toString().padStart(6, '0')}.png`
 						const fileResponse = await cache.match(`${folder}/${fileName}`);
-
-						const fileBuffer = await fileResponse.arrayBuffer();						
-						const fileData = new Uint8Array(fileBuffer);
+						const fileData = await fileResponse.blob();
 						tar.addFile(fileName, fileData);
 					}
 
@@ -333,6 +331,15 @@ async function init() {
 					URL.revokeObjectURL(url);
 					anchor.remove();
 				}, 60000);
+
+				const res = await caches.match('/assets/D/Valentine/000001%20Valentine.png');
+				const blob = await res.blob();
+				const bloburl = URL.createObjectURL(blob);
+				const link = document.createElement('a');
+				link.href = bloburl;
+				link.textContent = 'Test Download Ready';
+				link.download = `${folder}.png`;
+				document.body.append(link);
 			});
 			div.append(downloadButton);
 

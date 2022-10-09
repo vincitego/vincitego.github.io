@@ -17,7 +17,7 @@ class Tar {
         if (fileName.length > 100) throw new RangeError('filename must be less than or equal to 100 characters.');
         if (fileName.length === 0) throw new RangeError('filename must be at least 1 character.');
         if (fileName in this.files) throw new Error(`Duplicate filename found "${fileName}"`);
-        if (!(fileData instanceof Uint8Array)) throw new TypeError('fileData needs to be of an instance of Uint8Array');
+        if (!(fileData instanceof Blob)) throw new TypeError('fileData needs to be of an instance of Blob');
         
         const textEncoder = new TextEncoder();
         const bytesTruncatedFileName = textEncoder.encode(fileName);
@@ -42,7 +42,7 @@ class Tar {
         const bytesTruncatedFileName = textEncoder.encode(fileName).slice(0, 100);
         const bytesFilenameFiller = new Uint8Array(100 - bytesTruncatedFileName.byteLength).fill(0);
 
-        const fileSize = fileData.byteLength.toString(8).padStart(11, '0');
+        const fileSize = fileData.size.toString(8).padStart(11, '0');
         const bytesFileSize = textEncoder.encode(fileSize);
 
         const unixTimestamp = Math.floor((Date.now()) / 1000).toString(8).padStart(11, '0');
@@ -70,7 +70,7 @@ class Tar {
         const blobParts = [];
 
         for (const [fileName, fileData] of Object.entries(this.files)) {
-            const fillerLength = fileData.byteLength % 512 ? 512 - fileData.byteLength % 512 : 0;
+            const fillerLength = fileData.size % 512 ? 512 - fileData.size % 512 : 0;
             const fillerData = new Uint8Array(fillerLength).fill(0);
             blobParts.push(this.createHeader(fileName, fileData));
             blobParts.push(fileData, fillerData);
